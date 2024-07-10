@@ -1,0 +1,39 @@
+name: kmstr
+
+services:
+  # importer:
+  #  image: kmstr/importer
+
+  # frontend:
+  #  image: kmstr/frontend
+
+  db:
+    image: postgres:16.3-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - ./docker/var/postgres:/var/lib/postgresql/data
+      - ./importer/resources/db:/docker-entrypoint-initdb.d
+    networks:
+      - db-backend
+    environment:
+      - POSTGRES_USER=${KMSTR_DB_USERNAME:-kmstr_appl}
+      - POSTGRES_PASSWORD=${KMSTR_DB_PASSWORD:-Password0!}
+      - POSTGRES_DB=${KMSTR_DB_NAME:-kmstr}
+
+  api:
+    image: postgrest/postgrest:latest
+    ports:
+      - 3000:3000
+    networks:
+      - db-backend
+    environment:
+      - PGRST_DB_URI=postgres://${KMSTR_DB_USERNAME}:${KMSTR_DB_PASSWORD}@db:5432/${KMSTR_DB_NAME}
+      - PGRST_JWT_SECRET=${KMSTR_JWT_SECRET}
+      - PGRST_DB_SCHEMA=${KMSTR_DB_NAME}
+      - PGRST_DB_ANON_ROLE=anon
+      - PGRST_OPENAPI_SERVER_PROXY=http://localhost:3000
+
+networks:
+  db-backend:
+    driver: bridge

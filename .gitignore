@@ -3,6 +3,8 @@
 
 # Python
 __pycache__/
+venv/
 
 # Secret stuff
+.env
 config.yaml

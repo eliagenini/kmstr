@@ -1,0 +1,4 @@
+weconnect[Images]~=0.60.3
+PyYAML~=6.0.1
+postgrest~=0.16.8
+PyJWT~=2.8.0
