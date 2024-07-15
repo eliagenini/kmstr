@@ -53,14 +53,14 @@ class Api(ABC):
         return self.client.from_(self.context).update(obj).eq("id", id).execute()
 
 
-class FuelStatus(Api):
+class FuelLevel(Api):
     def __init__(self, endpoint):
-        super().__init__(endpoint, "fuel_status")
+        super().__init__(endpoint, "fuel_level")
 
 
-class FuelType(Api):
+class TotalRange(Api):
     def __init__(self, endpoint):
-        super().__init__(endpoint, "fuel_type")
+        super().__init__(endpoint, "total_range")
 
 
 class Mileage(Api):
@@ -71,3 +71,8 @@ class Mileage(Api):
 class Vehicle(Api):
     def __init__(self, endpoint):
         super().__init__(endpoint, "vehicles")
+
+
+class Parking(Api):
+    def __init__(self, endpoint):
+        super().__init__(endpoint, "parking")
