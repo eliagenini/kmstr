@@ -24,9 +24,11 @@ CREATE TABLE IF NOT EXISTS kmstr.vehicles
 (
     id       serial NOT NULL,
     vin      text   NOT NULL,
-    model    text   NOT NULL,
-    nickname text   NOT NULL,
-    image    text
+    model    text,
+    nickname text,
+    image    text,
+    last_update timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_change timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS kmstr.fuel_type

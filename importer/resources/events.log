@@ -8,8 +8,8 @@ New attribute is available: /vehicles/WVGZZZ1T5RW028165/enrollmentStatus: Enroll
 Value changed: /vehicles/WVGZZZ1T5RW028165/enrollmentStatus: EnrollmentStatus.COMPLETED
 New attribute is available: /vehicles/WVGZZZ1T5RW028165/userRoleStatus: UserRoleStatus.UNKNOWN
 Value changed: /vehicles/WVGZZZ1T5RW028165/userRoleStatus: UserRoleStatus.UNKNOWN
-New attribute is available: /vehicles/WVGZZZ1T5RW028165/model: Touran
-Value changed: /vehicles/WVGZZZ1T5RW028165/model: Touran
+New attribute is available: /vehicles/WVGZZZ1T5RW028165/models: Touran
+Value changed: /vehicles/WVGZZZ1T5RW028165/models: Touran
 New attribute is available: /vehicles/WVGZZZ1T5RW028165/devicePlatform: DevicePlatform.MBB_ODP
 Value changed: /vehicles/WVGZZZ1T5RW028165/devicePlatform: DevicePlatform.MBB_ODP
 New attribute is available: /vehicles/WVGZZZ1T5RW028165/nickname: Touran Highline 1.5 l TSI GPF
@@ -570,8 +570,8 @@ New attribute is available: /vehicles/WVWZZZAWZMY037089/enrollmentStatus: Enroll
 Value changed: /vehicles/WVWZZZAWZMY037089/enrollmentStatus: EnrollmentStatus.COMPLETED
 New attribute is available: /vehicles/WVWZZZAWZMY037089/userRoleStatus: UserRoleStatus.ENABLED
 Value changed: /vehicles/WVWZZZAWZMY037089/userRoleStatus: UserRoleStatus.ENABLED
-New attribute is available: /vehicles/WVWZZZAWZMY037089/model: Polo
-Value changed: /vehicles/WVWZZZAWZMY037089/model: Polo
+New attribute is available: /vehicles/WVWZZZAWZMY037089/models: Polo
+Value changed: /vehicles/WVWZZZAWZMY037089/models: Polo
 New attribute is available: /vehicles/WVWZZZAWZMY037089/devicePlatform: DevicePlatform.MBB_ODP
 Value changed: /vehicles/WVWZZZAWZMY037089/devicePlatform: DevicePlatform.MBB_ODP
 New attribute is available: /vehicles/WVWZZZAWZMY037089/nickname: Polo Trendline 1.0 l
@@ -1102,7 +1102,7 @@ Attribute is not available anymore: /vehicles/WVGZZZ1T5RW028165/vin
 Attribute is not available anymore: /vehicles/WVGZZZ1T5RW028165/role
 Attribute is not available anymore: /vehicles/WVGZZZ1T5RW028165/enrollmentStatus
 Attribute is not available anymore: /vehicles/WVGZZZ1T5RW028165/userRoleStatus
-Attribute is not available anymore: /vehicles/WVGZZZ1T5RW028165/model
+Attribute is not available anymore: /vehicles/WVGZZZ1T5RW028165/models
 Attribute is not available anymore: /vehicles/WVGZZZ1T5RW028165/devicePlatform
 Attribute is not available anymore: /vehicles/WVGZZZ1T5RW028165/nickname
 Attribute is not available anymore: /vehicles/WVGZZZ1T5RW028165/brandCode
@@ -1379,7 +1379,7 @@ Attribute is not available anymore: /vehicles/WVWZZZAWZMY037089/vin
 Attribute is not available anymore: /vehicles/WVWZZZAWZMY037089/role
 Attribute is not available anymore: /vehicles/WVWZZZAWZMY037089/enrollmentStatus
 Attribute is not available anymore: /vehicles/WVWZZZAWZMY037089/userRoleStatus
-Attribute is not available anymore: /vehicles/WVWZZZAWZMY037089/model
+Attribute is not available anymore: /vehicles/WVWZZZAWZMY037089/models
 Attribute is not available anymore: /vehicles/WVWZZZAWZMY037089/devicePlatform
 Attribute is not available anymore: /vehicles/WVWZZZAWZMY037089/nickname
 Attribute is not available anymore: /vehicles/WVWZZZAWZMY037089/brandCode

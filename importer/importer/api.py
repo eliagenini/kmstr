@@ -8,6 +8,8 @@ import os
 
 import postgrest
 
+import models.vehicle
+
 
 def datetime_to_ms(dt: Optional[datetime.datetime] = None):
     if not dt:
@@ -62,6 +64,20 @@ class TotalRange(Api):
     def __init__(self, endpoint):
         super().__init__(endpoint, "total_range")
 
+    def put(self, obj):
+        data = super().put(obj)
+        return models.range.Range(data)
+
+    def get_last_range_by_vehicle(self, vehicle):
+        data = (self.get_client().from_("total_range").select("*")
+                .eq("vehicle", vehicle.id)
+                .neq("last_modified", None)
+                .order("last_modified", desc=True)
+                .limit(1)
+                .execute())
+
+        return models.range.Range(data)
+
 
 class Mileage(Api):
     def __init__(self, endpoint):
@@ -71,6 +87,23 @@ class Mileage(Api):
 class Vehicle(Api):
     def __init__(self, endpoint):
         super().__init__(endpoint, "vehicles")
+
+    def find_all(self):
+        results = []
+        data = super().find_all()
+
+        for d in data:
+            results.append(models.vehicle.Vehicle(d))
+
+        return results
+
+    def get(self, id: int | str, key: Optional[str] = None):
+        data = super().get(id, key)
+        return models.vehicle.Vehicle(data)
+
+    def put(self, obj):
+        data = super().put(obj)
+        return models.vehicle.Vehicle(data)
 
 
 class Parking(Api):

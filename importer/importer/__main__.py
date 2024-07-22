@@ -1,4 +1,4 @@
-from kmstr_base_scheduled import Kmstr
+from kmstr_base import Kmstr
 
 if __name__ == '__main__':
     kmstr = Kmstr()

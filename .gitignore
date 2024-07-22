@@ -8,3 +8,6 @@ venv/
 # Secret stuff
 .env
 config.yaml
+
+# Docker
+docker/
