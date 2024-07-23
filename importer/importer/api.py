@@ -76,7 +76,7 @@ class TotalRange(Api):
 
     def get_last_range_by_vehicle(self, vehicle):
         data = (self.get_client().from_("total_range").select("*")
-                .eq("vehicle", vehicle.id)
+                .eq("vehicle", vehicle)
                 .neq("last_modified", None)
                 .order("last_modified", desc=True)
                 .limit(1)

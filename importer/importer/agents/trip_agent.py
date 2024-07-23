@@ -1,7 +1,6 @@
 from datetime import datetime, timezone, timedelta
 from enum import Enum, auto
 from weconnect.addressable import AddressableLeaf
-from ..api import Trip
 import logging
 
 LOG = logging.getLogger("kmstr")
@@ -13,12 +12,12 @@ class TripAgent:
         READINESS_STATUS = auto()
         NONE = auto()
 
-    def __init__(self, endpoint, vehicle, update_interval):
-        self.endpoint = endpoint
+    def __init__(self, api, vehicle, update_interval):
+        self.api = api
         self.vehicle = vehicle
 
         self.mode = TripAgent.Mode.NONE
-        self.trip = Trip(self.endpoint).get_last_trip_by_vehicle(vehicle.id)
+        self.trip = self.api.get_last_trip_by_vehicle(vehicle.id)
         self.last_parking_position = None
 
         self.update_interval = update_interval

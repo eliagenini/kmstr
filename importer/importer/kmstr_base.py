@@ -7,15 +7,31 @@ import logging.handlers
 from weconnect import weconnect, addressable
 from weconnect.errors import APICompatibilityError, AuthentificationError, TemporaryAuthentificationError
 from weconnect.domain import Domain
+from weconnect.elements import vehicle as elementvehicle
 
-import models.vehicle
-from api import Vehicle
-from agents import RangeAgent, TripAgent
+from api import Vehicle, TotalRange
+from agents import RangeAgent
 
 LOG_LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 DEFAULT_LOG_LEVEL = "INFO"
 
 LOG = logging.getLogger("kmstr")
+
+
+def on_we_connect_event(element, flags):
+    """Simple callback example
+
+    Args:
+        element (AddressableObject): Object for which an event occured
+        flags (AddressableLeaf.ObserverEvent): Information about the type of the event
+    """
+    if isinstance(element, addressable.AddressableAttribute):
+        if flags & addressable.AddressableLeaf.ObserverEvent.ENABLED:
+            print(f'New attribute is available: {element.getGlobalAddress()}: {element.value}')
+        elif flags & addressable.AddressableLeaf.ObserverEvent.VALUE_CHANGED:
+            print(f'Value changed: {element.getGlobalAddress()}: {element.value}')
+        elif flags & addressable.AddressableLeaf.ObserverEvent.DISABLED:
+            print(f'Attribute is not available anymore: {element.getGlobalAddress()}')
 
 
 class Kmstr:
@@ -25,16 +41,17 @@ class Kmstr:
         self.loggingFormat = '%(asctime)s:%(levelname)s:%(module)s:%(message)s'
         self.loggingDateFormat = '%Y-%m-%dT%H:%M:%S%z'
 
-        self.db_url = 'postgresql+psycopg://kmstr_appl:Password0!@localhost:5432/kmstr'
-        self.db_conn_args = {'options': '-c timezone=utc'}
+        #self.db_url = 'postgresql+psycopg://kmstr_appl:Password0!@localhost:5432/kmstr'
+        #self.db_conn_args = {'options': '-c timezone=utc'}
         self.endpoint = 'http://localhost:3000'
 
+        self.conn = None
         self.username = 'elia.genini@gmail.com'
         self.password = '12345678!'
         self.interval = 300
         self.subscriptions = []
 
-        self.agents = []
+        self.agents = {}
         self.vehicles = []
         # self.conn.login()
         # self.conn.addObserver(self.on_we_connect_event, addressable.AddressableLeaf.ObserverEvent.ALL)
@@ -49,14 +66,12 @@ class Kmstr:
         engine = None
         try:
             LOG.info("Trying to login into WeConnect")
-            # conn = weconnect.WeConnect(username=self.username, password=self.password, updateAfterLogin=False,
-            #                           loginOnInit=False, maxAgePictures=86400, forceReloginAfter=21600)
-            # conn.addObserver(self.on_enable, addressable.AddressableLeaf.ObserverEvent.ENABLED, onUpdateComplete=True)
-            # conn.addObserver(self.on_we_connect_event, addressable.AddressableLeaf.ObserverEvent.ALL)
+            self.conn = weconnect.WeConnect(username=self.username, password=self.password, updateAfterLogin=False,
+                                            loginOnInit=False, maxAgePictures=86400, forceReloginAfter=21600)
+            self.conn.addObserver(self.on_enable, addressable.AddressableLeaf.ObserverEvent.ENABLED, onUpdateComplete=True)
+            self.conn.addObserver(on_we_connect_event, addressable.AddressableLeaf.ObserverEvent.ALL)
 
             self.vehicles = Vehicle(self.endpoint).find_all()
-
-            exit()
 
             starttime = time.time()
             subsequentErrors = 0
@@ -64,7 +79,7 @@ class Kmstr:
             sleeptime = self.interval
             while True:
                 try:
-                    conn.update(updateCapabilities=True,
+                    self.conn.update(updateCapabilities=True,
                                 updatePictures=True,
                                 force=True,
                                 selective=[Domain.ACCESS,
@@ -135,20 +150,18 @@ class Kmstr:
             if conn is not None:
                 conn.disconnect()
 
-    def init_vehicles(self):
-        pass
-        # _vehicle = Vehicle(self.endpoint)
-        # for vin, vehicle in self.conn.vehicles.items():
-        #    if not _vehicle.get(vin, 'vin'):
-        #        print('# Vehicle {} to create'.format(vin))
-        #        _v = _vehicle.put(
-        #            {'vin': vehicle.vin.value, 'model': vehicle.model.value, 'nickname': vehicle.nickname.value})
-        #        print('    Created {}'.format(_v))
+    # def init_vehicles(self):
+    #     _vehicle = Vehicle(self.endpoint)
+    #     for vin, vehicle in self.conn.vehicles.items():
+    #        if not _vehicle.get(vin, 'vin'):
+    #            LOG.info('# Vehicle %s to create', vin)
+    #            _v = _vehicle.put(
+    #                {'vin': vehicle.vin.value, 'model': vehicle.model.value, 'nickname': vehicle.nickname.value})
+    #            LOG.info('Created %s', _v)
 
     def on_enable(self, element, flags):
-        pass
-        if (flags & addressable.AddressableLeaf.ObserverEvent.ENABLED) and isinstance(element, element.vehicle.Vehicle):
-            if element.vin not in self.vehicles:
+        if (flags & addressable.AddressableLeaf.ObserverEvent.ENABLED) and isinstance(element, elementvehicle.Vehicle):
+            if element.vin not in self.agents:
                 self.agents[element.vin.value] = []
 
             found_vehicle = None
@@ -165,30 +178,16 @@ class Kmstr:
 
             found_vehicle.connect(element)
 
-            self.agents[element.vin.value].append(RangeAgent(vehicle=found_vehicle))
+            self.agents[element.vin.value].append(RangeAgent(api=TotalRange(self.endpoint), vehicle=found_vehicle))
             # self.agents[element.vin.value].append(BatteryAgent(session=self.Session(), vehicle=foundVehicle))
             # self.agents[element.vin.value].append(ChargeAgent(session=self.Session(), vehicle=foundVehicle, privacy=self.privacy))
             # self.agents[element.vin.value].append(StateAgent(session=self.Session(), vehicle=foundVehicle, updateInterval=self.interval))
             # self.agents[element.vin.value].append(ClimatizationAgent(session=self.Session(), vehicle=foundVehicle))
             # self.agents[element.vin.value].append(RefuelAgent(session=self.Session(), vehicle=foundVehicle, privacy=self.privacy))
-            self.agents[element.vin.value].append(TripAgent(endpoint=self.endpoint, vehicle=found_vehicle, update_interval=self.interval))
+            #self.agents[element.vin.value].append(TripAgent(endpoint=self.endpoint, vehicle=found_vehicle, update_interval=self.interval))
             # self.agents[element.vin.value].append(WarningLightAgent(session=self.Session(), vehicle=foundVehicle))
             # self.agents[element.vin.value].append(MaintenanceAgent(session=self.Session(), vehicle=foundVehicle))
             #     if foundVehicle.carType == RangeStatus.CarType.UNKNOWN:
             #         LOG.warning('Vehicle %s has an unkown carType, thus some features won\'t be available until the correct carType could be detected',
             #                     foundVehicle.vin)
 
-    def on_we_connect_event(element, flags):
-        """Simple callback example
-
-        Args:
-            element (AddressableObject): Object for which an event occured
-            flags (AddressableLeaf.ObserverEvent): Information about the type of the event
-        """
-        if isinstance(element, addressable.AddressableAttribute):
-            if flags & addressable.AddressableLeaf.ObserverEvent.ENABLED:
-                print(f'New attribute is available: {element.getGlobalAddress()}: {element.value}')
-            elif flags & addressable.AddressableLeaf.ObserverEvent.VALUE_CHANGED:
-                print(f'Value changed: {element.getGlobalAddress()}: {element.value}')
-            elif flags & addressable.AddressableLeaf.ObserverEvent.DISABLED:
-                print(f'Attribute is not available anymore: {element.getGlobalAddress()}')

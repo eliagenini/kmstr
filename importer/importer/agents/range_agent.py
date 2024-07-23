@@ -1,17 +1,16 @@
 from datetime import datetime, timezone, timedelta
 from weconnect.addressable import AddressableLeaf
 
-from ..api import TotalRange
 import logging
 
 LOG = logging.getLogger("kmstr")
 
 
 class RangeAgent:
-    def __init__(self, endpoint, vehicle):
-        self.endpoint = endpoint
+    def __init__(self, api, vehicle):
+        self.api = api
         self.vehicle = vehicle
-        self.range = TotalRange(endpoint).get_last_range_by_vehicle(vehicle.id)
+        self.range = api.get_last_range_by_vehicle(vehicle.id)
 
         if self.vehicle.remote is not None:
             if (self.vehicle.remote.statusExists('fuelStatus', 'rangeStatus')
@@ -49,7 +48,7 @@ class RangeAgent:
                                            or self.range.primary_remainingRange_km != current_primary_remaining_range_km
                                            or self.range.secondary_currentSOC_pct != current_secondary_current_soc_pct
                                            or self.range.secondary_remainingRange_km != current_secondary_remaining_range_km)):
-                self.range = TotalRange(self.endpoint).put({
+                self.range = self.api.put({
                     'vehicle': self.vehicle.id,
                     'range': current_total_range_km,
                     'last_modified': range_status.carCapturedTimestamp.value

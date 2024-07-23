@@ -4,12 +4,12 @@ from weconnect.addressable import AddressableLeaf
 class Vehicle:
 
     def __init__(self, data):
-        self.id = data.get('id')
-        self.vin = data.get('vin')
-        self.model = data.get('model')
-        self.nickname = data.get('nickname')
-        self.lastUpdate = data.get('last_update')
-        self.lastChange = data.get('last_change')
+        self.id = data['id']
+        self.vin = data['vin']
+        self.model = data['model']
+        self.nickname = data['nickname']
+        self.lastUpdate = data['last_update']
+        self.lastChange = data['last_change']
 
         self.remote = None
 

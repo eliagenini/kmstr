@@ -1,7 +1,7 @@
 class Range:
 
     def __init__(self, data):
-        self.id = data.get('id')
-        self.vehicle = data.get('vehicle')
-        self.range = data.get('range')
-        self.last_modified = data.get('last_modified')
+        self.id = data['id']
+        self.vehicle = data['vehicle']
+        self.range = data['range']
+        self.last_modified = data['last_modified']
