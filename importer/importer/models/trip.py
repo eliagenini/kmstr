@@ -1,5 +1,3 @@
-from weconnect.addressable import AddressableLeaf
-
 class Trip:
 
     def __init__(self, data):

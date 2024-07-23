@@ -1,11 +1,11 @@
 __author__ = 'eliagenini'
 
-import time
 import logging
 import logging.handlers
-
+import time
 from weconnect import weconnect
 from weconnect.errors import APICompatibilityError, AuthentificationError, TemporaryAuthentificationError
+
 from api import Vehicle, FuelLevel, TotalRange, Mileage, Parking
 
 LOG_LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
@@ -61,8 +61,8 @@ class Kmstr:
 
                     LOG.warning('Temporary error during reauthentification.')
 
-                LOG.info("Sleeping for %d seconds", self.interval * (errors+1))
-                time.sleep(self.interval * (errors+1))
+                LOG.info("Sleeping for %d seconds", self.interval * (errors + 1))
+                time.sleep(self.interval * (errors + 1))
 
                 self.conn.update(force=True)
 
@@ -115,4 +115,3 @@ class Kmstr:
                 '/vehicles/{}/parking/parkingPosition/longitude'.format(vehicle)).value
             LOG.info('  Parked at {},{}'.format(lat, lon))
             Parking(self.endpoint).put({'vehicle': id, 'latitude': lat, 'longitude': lon})
-

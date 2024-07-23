@@ -1,6 +1,3 @@
-from weconnect.addressable import AddressableLeaf
-
-
 class Range:
 
     def __init__(self, data):
@@ -8,4 +5,3 @@ class Range:
         self.vehicle = data.get('vehicle')
         self.range = data.get('range')
         self.last_modified = data.get('last_modified')
-

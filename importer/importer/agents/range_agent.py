@@ -1,7 +1,10 @@
-from ..api import TotalRange
-from weconnect.addressable import AddressableLeaf
 from datetime import datetime, timezone, timedelta
+from weconnect.addressable import AddressableLeaf
+
+from ..api import TotalRange
 import logging
+
+LOG = logging.getLogger("kmstr")
 
 
 class RangeAgent:
@@ -13,7 +16,6 @@ class RangeAgent:
         if self.vehicle.remote is not None:
             if (self.vehicle.remote.statusExists('fuelStatus', 'rangeStatus')
                     and self.vehicle.remote.domains['fuelStatus']['rangeStatus'].enabled):
-
                 self.vehicle.remote.domains['fuelStatus']['rangeStatus'].carCapturedTimestamp.addObserver(
                     self.__on_car_captured_timestamp_change,
                     AddressableLeaf.ObserverEvent.VALUE_CHANGED,
@@ -25,7 +27,8 @@ class RangeAgent:
 
     def __on_car_captured_timestamp_change(self, element, flags):  # noqa: C901
         # Check that the data to add is not too old
-        if element is not None and element.value is not None and element.value > (datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=7)):
+        if element is not None and element.value is not None and element.value > (
+                datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=7)):
             range_status = self.vehicle.weConnectVehicle.domains['fuelStatus']['rangeStatus']
             current_total_range_km = range_status.totalRange_km.value
             current_primary_current_soc_pct = None
@@ -46,7 +49,6 @@ class RangeAgent:
                                            or self.range.primary_remainingRange_km != current_primary_remaining_range_km
                                            or self.range.secondary_currentSOC_pct != current_secondary_current_soc_pct
                                            or self.range.secondary_remainingRange_km != current_secondary_remaining_range_km)):
-
                 self.range = TotalRange(self.endpoint).put({
                     'vehicle': self.vehicle.id,
                     'range': current_total_range_km,

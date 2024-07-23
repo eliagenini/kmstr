@@ -5,15 +5,12 @@ import logging
 import logging.handlers
 
 from weconnect import weconnect, addressable
-from weconnect.elements import vehicle
 from weconnect.errors import APICompatibilityError, AuthentificationError, TemporaryAuthentificationError
 from weconnect.domain import Domain
 
-from sqlalchemy import create_engine, select
-from sqlalchemy.orm import sessionmaker, scoped_session
-
 import models.vehicle
 from api import Vehicle
+from agents import RangeAgent, TripAgent
 
 LOG_LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 DEFAULT_LOG_LEVEL = "INFO"
@@ -52,10 +49,10 @@ class Kmstr:
         engine = None
         try:
             LOG.info("Trying to login into WeConnect")
-            #conn = weconnect.WeConnect(username=self.username, password=self.password, updateAfterLogin=False,
+            # conn = weconnect.WeConnect(username=self.username, password=self.password, updateAfterLogin=False,
             #                           loginOnInit=False, maxAgePictures=86400, forceReloginAfter=21600)
-            #conn.addObserver(self.on_enable, addressable.AddressableLeaf.ObserverEvent.ENABLED, onUpdateComplete=True)
-            #conn.addObserver(self.on_we_connect_event, addressable.AddressableLeaf.ObserverEvent.ALL)
+            # conn.addObserver(self.on_enable, addressable.AddressableLeaf.ObserverEvent.ENABLED, onUpdateComplete=True)
+            # conn.addObserver(self.on_we_connect_event, addressable.AddressableLeaf.ObserverEvent.ALL)
 
             self.vehicles = Vehicle(self.endpoint).find_all()
 
@@ -140,8 +137,8 @@ class Kmstr:
 
     def init_vehicles(self):
         pass
-        #_vehicle = Vehicle(self.endpoint)
-        #for vin, vehicle in self.conn.vehicles.items():
+        # _vehicle = Vehicle(self.endpoint)
+        # for vin, vehicle in self.conn.vehicles.items():
         #    if not _vehicle.get(vin, 'vin'):
         #        print('# Vehicle {} to create'.format(vin))
         #        _v = _vehicle.put(
@@ -168,21 +165,18 @@ class Kmstr:
 
             found_vehicle.connect(element)
 
-            # self.agents[element.vin.value].append(RangeAgent(session=self.Session(), vehicle=foundVehicle))
+            self.agents[element.vin.value].append(RangeAgent(vehicle=found_vehicle))
             # self.agents[element.vin.value].append(BatteryAgent(session=self.Session(), vehicle=foundVehicle))
             # self.agents[element.vin.value].append(ChargeAgent(session=self.Session(), vehicle=foundVehicle, privacy=self.privacy))
             # self.agents[element.vin.value].append(StateAgent(session=self.Session(), vehicle=foundVehicle, updateInterval=self.interval))
             # self.agents[element.vin.value].append(ClimatizationAgent(session=self.Session(), vehicle=foundVehicle))
             # self.agents[element.vin.value].append(RefuelAgent(session=self.Session(), vehicle=foundVehicle, privacy=self.privacy))
-            # self.agents[element.vin.value].append(TripAgent(session=self.Session(), vehicle=foundVehicle, updateInterval=self.interval,
-            #                                                   privacy=self.privacy))
+            self.agents[element.vin.value].append(TripAgent(endpoint=self.endpoint, vehicle=found_vehicle, update_interval=self.interval))
             # self.agents[element.vin.value].append(WarningLightAgent(session=self.Session(), vehicle=foundVehicle))
             # self.agents[element.vin.value].append(MaintenanceAgent(session=self.Session(), vehicle=foundVehicle))
             #     if foundVehicle.carType == RangeStatus.CarType.UNKNOWN:
             #         LOG.warning('Vehicle %s has an unkown carType, thus some features won\'t be available until the correct carType could be detected',
             #                     foundVehicle.vin)
-
-
 
     def on_we_connect_event(element, flags):
         """Simple callback example

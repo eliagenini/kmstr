@@ -22,11 +22,11 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA kmstr GRANT USAGE, SELECT ON SEQUENCES TO dat
 
 CREATE TABLE IF NOT EXISTS kmstr.vehicles
 (
-    id       serial NOT NULL,
-    vin      text   NOT NULL,
-    model    text,
-    nickname text,
-    image    text,
+    id          serial    NOT NULL,
+    vin         text      NOT NULL,
+    model       text,
+    nickname    text,
+    image       text,
     last_update timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_change timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -51,6 +51,21 @@ CREATE TABLE IF NOT EXISTS kmstr.total_range
     vehicle       integer   NOT NULL,
     range         integer   NOT NULL,
     last_modified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS kmstr.trip
+(
+    id                       serial    NOT NULL,
+    vehicle                  integer   NOT NULL,
+    start_date               timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    end_date                 timestamp,
+    start_position_latitude  float     NOT NULL,
+    start_position_longitude float     NOT NULL,
+    end_position_latitude    float,
+    end_position_longitude   float,
+    start_mileage            integer   NOT NULL,
+    end_mileage              integer,
+    last_modified            timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS kmstr.mileage
@@ -80,6 +95,9 @@ ALTER TABLE ONLY kmstr.fuel_level
 ALTER TABLE ONLY kmstr.total_range
     ADD CONSTRAINT total_range_pk PRIMARY KEY (id),
     ADD CONSTRAINT total_range_fk_vehicle FOREIGN KEY (vehicle) REFERENCES kmstr.vehicles (id);
+ALTER TABLE ONLY kmstr.trip
+    ADD CONSTRAINT trip_pk PRIMARY KEY (id),
+    ADD CONSTRAINT trip_fk_vehicle FOREIGN KEY (vehicle) REFERENCES kmstr.vehicles (id);
 ALTER TABLE ONLY kmstr.mileage
     ADD CONSTRAINT mileage_pk PRIMARY KEY (id),
     ADD CONSTRAINT mileage_fk_vehicle FOREIGN KEY (vehicle) REFERENCES kmstr.vehicles (id);

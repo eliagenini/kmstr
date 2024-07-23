@@ -1,5 +1,5 @@
-from datetime import datetime, timezone
 import sqlalchemy
+from datetime import datetime, timezone
 
 
 class DatetimeDecorator(sqlalchemy.types.TypeDecorator):

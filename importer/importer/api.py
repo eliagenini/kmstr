@@ -1,12 +1,10 @@
 __author__ = 'eliagenini'
 
-from abc import ABC
-from typing import Optional
 import datetime
 import jwt
-import os
-
 import postgrest
+from abc import ABC
+from typing import Optional
 
 import models.vehicle
 
@@ -34,7 +32,7 @@ class Api(ABC):
 
     def generate_jwt(self, role: str, jwt_secret: Optional[str] = None):
         if jwt_secret is None:
-            jwt_secret = 'iquaeC7Pa2eiquishooR7funaiVaigop'  #os.environ["KMSTR_JWT_SECRET"]
+            jwt_secret = 'iquaeC7Pa2eiquishooR7funaiVaigop'  # os.environ["KMSTR_JWT_SECRET"]
         return jwt.encode({'role': role, 'aud': self.endpoint}, jwt_secret, algorithm='HS256')
 
     def find_all(self):
@@ -53,6 +51,14 @@ class Api(ABC):
 
     def update(self, id: int, obj):
         return self.client.from_(self.context).update(obj).eq("id", id).execute()
+
+    def get_last_by_vehicle(self, vehicle):
+        return (self.get_client().from_(self.context).select("*")
+                .eq("vehicle", vehicle.id)
+                .neq("last_modified", None)
+                .order("last_modified", desc=True)
+                .limit(1)
+                .execute())
 
 
 class FuelLevel(Api):
@@ -109,3 +115,14 @@ class Vehicle(Api):
 class Parking(Api):
     def __init__(self, endpoint):
         super().__init__(endpoint, "parking")
+
+
+class Trip(Api):
+    def __init__(self, endpoint):
+        self.context = "trip"
+        super().__init__(endpoint, self.context)
+
+    def get_last_trip_by_vehicle(self, vehicle):
+        data = super().get_last_by_vehicle(vehicle)
+
+        return models.trip.Trip(data)
