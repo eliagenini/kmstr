@@ -25,7 +25,7 @@ class MileageAgent(BaseAgent):
                 self.vehicle.remote.domains['measurements']['odometerStatus'].carCapturedTimestamp.addObserver(
                     self.__on_car_captured_timestamp_change,
                     AddressableLeaf.ObserverEvent.VALUE_CHANGED,
-                    onUpdateComplete=True
+                    onUpdateComplete=True,
                 )
                 self.__on_car_captured_timestamp_change(
                     self.vehicle.remote.domains['measurements']['odometerStatus'].carCapturedTimestamp, None)

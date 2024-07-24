@@ -121,6 +121,15 @@ CREATE TABLE IF NOT EXISTS kmstr.refuels
     longitude numeric
 );
 
+CREATE TABLE IF NOT EXISTS kmstr.pictures
+(
+    id            serial    NOT NULL,
+    vin           text      NOT NULL,
+    name        text    NOT NULL,
+    image       bytea   NOT NULL,
+    captured_timestamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 ALTER TABLE ONLY kmstr.vehicles
     ADD CONSTRAINT vehicles_pk PRIMARY KEY (vin);
 ALTER TABLE ONLY kmstr.ranges
@@ -145,6 +154,9 @@ ALTER TABLE ONLY kmstr.trips
 ALTER TABLE ONLY kmstr.refuels
     ADD CONSTRAINT refuels_pk PRIMARY KEY (id),
     ADD CONSTRAINT refuels_fk_location FOREIGN KEY (location_id) REFERENCES kmstr.locations (osm_id);
+ALTER TABLE ONLY kmstr.pictures
+    ADD CONSTRAINT pictures_pk PRIMARY KEY (id),
+    ADD CONSTRAINT pictures_fk_vehicle FOREIGN KEY (vin) REFERENCES kmstr.vehicles (vin);
 
 COMMIT;
 

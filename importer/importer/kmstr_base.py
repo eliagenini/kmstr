@@ -1,20 +1,23 @@
 __author__ = 'eliagenini'
 
+import base64
 import time
 import logging
 import logging.handlers
 
+from PIL import Image
 from sqlalchemy import create_engine, text, inspect
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.exc import OperationalError
 
 from weconnect import weconnect, addressable
+from weconnect.addressable import AddressableLeaf
 from weconnect.errors import APICompatibilityError, AuthentificationError, TemporaryAuthentificationError
 from weconnect.domain import Domain
 from weconnect.elements import vehicle as elementvehicle
 
-from models import Vehicle
-from agents import RangeAgent, MileageAgent, RefuelAgent
+from models import Vehicle, Picture
+from agents import RangeAgent, MileageAgent, RefuelAgent, ImageAgent
 
 LOG_LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 DEFAULT_LOG_LEVEL = "INFO"
@@ -22,20 +25,20 @@ DEFAULT_LOG_LEVEL = "INFO"
 LOG = logging.getLogger("kmstr")
 
 
-def on_we_connect_event(element, flags):
-    """Simple callback example
-
-    Args:
-        element (AddressableObject): Object for which an event occured
-        flags (AddressableLeaf.ObserverEvent): Information about the type of the event
-    """
-    if isinstance(element, addressable.AddressableAttribute):
-        if flags & addressable.AddressableLeaf.ObserverEvent.ENABLED:
-            print(f'New attribute is available: {element.getGlobalAddress()}: {element.value}')
-        elif flags & addressable.AddressableLeaf.ObserverEvent.VALUE_CHANGED:
-            print(f'Value changed: {element.getGlobalAddress()}: {element.value}')
-        elif flags & addressable.AddressableLeaf.ObserverEvent.DISABLED:
-            print(f'Attribute is not available anymore: {element.getGlobalAddress()}')
+# def on_we_connect_event(element, flags):
+#     """Simple callback example
+#
+#     Args:
+#         element (AddressableObject): Object for which an event occured
+#         flags (AddressableLeaf.ObserverEvent): Information about the type of the event
+#     """
+#     if isinstance(element, addressable.AddressableAttribute):
+#         if flags & addressable.AddressableLeaf.ObserverEvent.ENABLED:
+#             print(f'New attribute is available: {element.getGlobalAddress()}: {element.value}')
+#         elif flags & addressable.AddressableLeaf.ObserverEvent.VALUE_CHANGED:
+#             print(f'Value changed: {element.getGlobalAddress()}: {element.value}')
+#         elif flags & addressable.AddressableLeaf.ObserverEvent.DISABLED:
+#             print(f'Attribute is not available anymore: {element.getGlobalAddress()}')
 
 
 class Kmstr:
@@ -76,7 +79,7 @@ class Kmstr:
             self.conn = weconnect.WeConnect(username=self.username, password=self.password, updateAfterLogin=False,
                                             loginOnInit=False, maxAgePictures=86400, forceReloginAfter=21600)
             self.conn.addObserver(self.on_enable, addressable.AddressableLeaf.ObserverEvent.ENABLED, onUpdateComplete=True)
-            self.conn.addObserver(on_we_connect_event, addressable.AddressableLeaf.ObserverEvent.ALL)
+            # self.conn.addObserver(on_we_connect_event, addressable.AddressableLeaf.ObserverEvent.ALL)
 
             self.vehicles = self.session.query(Vehicle).all()
 
@@ -195,6 +198,7 @@ class Kmstr:
             self.agents[element.vin.value].append(RangeAgent(session=self.session, vehicle=found_vehicle))
             self.agents[element.vin.value].append(MileageAgent(session=self.session, vehicle=found_vehicle))
             self.agents[element.vin.value].append(RefuelAgent(session=self.session, vehicle=found_vehicle))
+            self.agents[element.vin.value].append(ImageAgent(session=self.session, vehicle=found_vehicle))
             #self.agents[element.vin.value].append(TripAgent(session=self.session, vehicle=found_vehicle, update_interval=self.interval))
             # self.agents[element.vin.value].append(BatteryAgent(session=self.Session(), vehicle=foundVehicle))
             # self.agents[element.vin.value].append(ChargeAgent(session=self.Session(), vehicle=foundVehicle, privacy=self.privacy))
@@ -207,4 +211,3 @@ class Kmstr:
             #     if foundVehicle.carType == RangeStatus.CarType.UNKNOWN:
             #         LOG.warning('Vehicle %s has an unkown carType, thus some features won\'t be available until the correct carType could be detected',
             #                     foundVehicle.vin)
-
