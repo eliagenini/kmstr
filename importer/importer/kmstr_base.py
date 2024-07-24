@@ -4,13 +4,17 @@ import time
 import logging
 import logging.handlers
 
+from sqlalchemy import create_engine, text, inspect
+from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.exc import OperationalError
+
 from weconnect import weconnect, addressable
 from weconnect.errors import APICompatibilityError, AuthentificationError, TemporaryAuthentificationError
 from weconnect.domain import Domain
 from weconnect.elements import vehicle as elementvehicle
 
-from api import Vehicle, TotalRange
-from agents import RangeAgent
+from models import Vehicle
+from agents import RangeAgent, MileageAgent, RefuelAgent
 
 LOG_LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 DEFAULT_LOG_LEVEL = "INFO"
@@ -41,8 +45,10 @@ class Kmstr:
         self.loggingFormat = '%(asctime)s:%(levelname)s:%(module)s:%(message)s'
         self.loggingDateFormat = '%Y-%m-%dT%H:%M:%S%z'
 
-        #self.db_url = 'postgresql+psycopg://kmstr_appl:Password0!@localhost:5432/kmstr'
-        #self.db_conn_args = {'options': '-c timezone=utc'}
+        self.engine = None
+        self.session = None
+        self.db_url = 'postgresql+psycopg://kmstr_appl:Password0!@localhost:5432/kmstr'
+        self.db_conn_args = {'options': '-c timezone=utc'}
         self.endpoint = 'http://localhost:3000'
 
         self.conn = None
@@ -62,16 +68,17 @@ class Kmstr:
 
         LOG.info("Starting Kmstr")
 
-        conn = None
-        engine = None
         try:
+            self.engine = create_engine(self.db_url, pool_pre_ping=True, connect_args=self.db_conn_args)
+            self.session = scoped_session(sessionmaker(bind=self.engine))()
+
             LOG.info("Trying to login into WeConnect")
             self.conn = weconnect.WeConnect(username=self.username, password=self.password, updateAfterLogin=False,
                                             loginOnInit=False, maxAgePictures=86400, forceReloginAfter=21600)
             self.conn.addObserver(self.on_enable, addressable.AddressableLeaf.ObserverEvent.ENABLED, onUpdateComplete=True)
             self.conn.addObserver(on_we_connect_event, addressable.AddressableLeaf.ObserverEvent.ALL)
 
-            self.vehicles = Vehicle(self.endpoint).find_all()
+            self.vehicles = self.session.query(Vehicle).all()
 
             starttime = time.time()
             subsequentErrors = 0
@@ -94,6 +101,12 @@ class Kmstr:
                                            Domain.OIL_LEVEL,
                                            Domain.MEASUREMENTS,
                                            Domain.PARKING])
+
+                    for vehicle_agents in self.agents.values():
+                        for agent in vehicle_agents:
+                            agent.commit()
+
+                        self.session.commit()
 
                     sleeptime = self.interval - ((time.time() - starttime) % self.interval)
                     permanentErrors = 0
@@ -147,8 +160,8 @@ class Kmstr:
             LOG.critical('There was a problem when communicating with WeConnect.'
                          ' If this problem persists please open a bug report: %s', e)
         finally:
-            if conn is not None:
-                conn.disconnect()
+            if self.conn is not None:
+                self.conn.disconnect()
 
     # def init_vehicles(self):
     #     _vehicle = Vehicle(self.endpoint)
@@ -172,13 +185,17 @@ class Kmstr:
                     break
             if found_vehicle is None:
                 LOG.info('Found no matching vehicle for vin %s in database, will create a new one', element.vin.value)
-                found_vehicle = Vehicle(self.endpoint).put(
-                    {'vin': element.vin.value}
-                )
+                found_vehicle = Vehicle(element.vin.value)
+                with self.session.begin_nested():
+                    self.session.add(found_vehicle)
+                self.session.commit()
 
             found_vehicle.connect(element)
 
-            self.agents[element.vin.value].append(RangeAgent(api=TotalRange(self.endpoint), vehicle=found_vehicle))
+            self.agents[element.vin.value].append(RangeAgent(session=self.session, vehicle=found_vehicle))
+            self.agents[element.vin.value].append(MileageAgent(session=self.session, vehicle=found_vehicle))
+            self.agents[element.vin.value].append(RefuelAgent(session=self.session, vehicle=found_vehicle))
+            #self.agents[element.vin.value].append(TripAgent(session=self.session, vehicle=found_vehicle, update_interval=self.interval))
             # self.agents[element.vin.value].append(BatteryAgent(session=self.Session(), vehicle=foundVehicle))
             # self.agents[element.vin.value].append(ChargeAgent(session=self.Session(), vehicle=foundVehicle, privacy=self.privacy))
             # self.agents[element.vin.value].append(StateAgent(session=self.Session(), vehicle=foundVehicle, updateInterval=self.interval))

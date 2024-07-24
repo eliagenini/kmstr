@@ -71,18 +71,20 @@ class TotalRange(Api):
         super().__init__(endpoint, "total_range")
 
     def put(self, obj):
-        data = super().put(obj)
-        return models.range.Range(data)
+        r = super().put(obj)
+        return models.range.Range(r.data[0])
 
     def get_last_range_by_vehicle(self, vehicle):
-        data = (self.get_client().from_("total_range").select("*")
-                .eq("vehicle", vehicle)
-                .neq("last_modified", None)
-                .order("last_modified", desc=True)
-                .limit(1)
-                .execute())
+        r = (self.get_client().from_("total_range").select("*")
+             .eq("vehicle", vehicle)
+             .order("last_modified", desc=True)
+             .limit(1)
+             .execute())
 
-        return models.range.Range(data)
+        if r.data:
+            return models.range.Range(r.data[0])
+
+        return None
 
 
 class Mileage(Api):
@@ -104,12 +106,12 @@ class Vehicle(Api):
         return results
 
     def get(self, id: int | str, key: Optional[str] = None):
-        data = super().get(id, key)
-        return models.vehicle.Vehicle(data)
+        r = super().get(id, key)
+        return models.vehicle.Vehicle(r.data)
 
     def put(self, obj):
-        data = super().put(obj)
-        return models.vehicle.Vehicle(data)
+        r = super().put(obj)
+        return models.vehicle.Vehicle(r.data[0])
 
 
 class Parking(Api):

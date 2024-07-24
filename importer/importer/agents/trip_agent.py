@@ -1,20 +1,24 @@
-from datetime import datetime, timezone, timedelta
 from enum import Enum, auto
-from weconnect.addressable import AddressableLeaf
 import logging
+from datetime import datetime, timezone, timedelta
+from agents.base import BaseAgent
+
+from weconnect.addressable import AddressableLeaf, AddressableAttribute
+from weconnect.elements.plug_status import PlugStatus
+
+from models.trip import Trip, Position
 
 LOG = logging.getLogger("kmstr")
 
 
-class TripAgent:
+class TripAgent(BaseAgent):
     class Mode(Enum):
         PARKING_POSITION = auto()
         READINESS_STATUS = auto()
         NONE = auto()
 
-    def __init__(self, api, vehicle, update_interval):
-        self.api = api
-        self.vehicle = vehicle
+    def __init__(self, session, vehicle, update_interval):
+        super().__init__(session, vehicle)
 
         self.mode = TripAgent.Mode.NONE
         self.trip = self.api.get_last_trip_by_vehicle(vehicle.id)
@@ -145,15 +149,15 @@ class TripAgent:
                 self.__on_car_captured_timestamp_enabled(element, flags)
 
     def __on_car_captured_timestamp_disabled(self, element: AddressableAttribute, flags):  # noqa: C901
-        if self.trip is not None:
-            try:
-                self.session.refresh(self.trip)
-            except ObjectDeletedError:
-                LOG.warning('Last trip entry was deleted')
-                self.trip = None
-            except InvalidRequestError:
-                LOG.warning('Last trip entry was not persisted')
-                self.trip = None
+        # if self.trip is not None:
+        #     try:
+        #         self.session.refresh(self.trip)
+        #     except ObjectDeletedError:
+        #         LOG.warning('Last trip entry was deleted')
+        #         self.trip = None
+        #     except InvalidRequestError:
+        #         LOG.warning('Last trip entry was not persisted')
+        #         self.trip = None
 
         if self.mode == TripAgent.Mode.PARKING_POSITION:
             if element.parent.error.enabled:
@@ -166,30 +170,31 @@ class TripAgent:
             time = datetime.utcnow().replace(tzinfo=timezone.utc, microsecond=0) - timedelta(
                 seconds=self.update_interval)
 
-            if Privacy.NO_LOCATIONS not in self.privacy:
-                startPositionLatitude = self.lastParkingPositionLatitude
-                startPositionLongitude = self.lastParkingPositionLongitude
-            else:
-                startPositionLatitude = None
-                startPositionLongitude = None
-            self.trip = Trip(self.vehicle, time, startPositionLatitude, startPositionLongitude, None, None)
-            if Privacy.NO_LOCATIONS not in self.privacy:
-                self.trip.start_location = locationFromLatLonWithGeofence(self.session, startPositionLatitude,
-                                                                          startPositionLongitude)
+            # if Privacy.NO_LOCATIONS not in self.privacy:
+            startPositionLatitude = self.lastParkingPositionLatitude
+            startPositionLongitude = self.lastParkingPositionLongitude
+            # else:
+            #     startPositionLatitude = None
+            #     startPositionLongitude = None
+            _trip = {
+                'vehicle': self.vehicle.id,
+                'date': {
+                    'start': time
+                },
+                'position': {
+                    'start': Position(lat=startPositionLatitude, long=startPositionLongitude)
+                }
+            }
 
             if self.vehicle.remote.statusExists('measurements', 'odometerStatus') \
                     and self.vehicle.remote.domains['measurements']['odometerStatus'].enabled:
                 odometerMeasurement = self.vehicle.remote.domains['measurements']['odometerStatus']
                 if odometerMeasurement.odometer.enabled and odometerMeasurement.odometer is not None:
-                    self.trip.start_mileage_km = odometerMeasurement.odometer.value
-            with self.session.begin_nested():
-                try:
-                    self.session.add(self.trip)
-                except IntegrityError as err:
-                    LOG.warning(
-                        'Could not add trip to the database, this is usually due to an error in the WeConnect API (%s)',
-                        err)
-            self.session.commit()
+                    _trip['mileage'] = {
+                        'start': odometerMeasurement.odometer.value
+                    }
+
+            self.trip = self.api.put(_trip)
             LOG.info(f'Vehicle {self.vehicle.vin} started a trip')
 
     def __on_car_captured_timestamp_changed(self, element, flags):
@@ -203,13 +208,6 @@ class TripAgent:
                 self.lastParkingPositionLongitude = parkingPosition.longitude.value
 
     def __on_car_captured_timestamp_enabled(self, element, flags):  # noqa: C901
-        if self.trip is not None:
-            try:
-                self.session.refresh(self.trip)
-            except ObjectDeletedError:
-                LOG.warning('Last trip entry was deleted')
-                self.trip = None
-
         if self.mode == TripAgent.Mode.PARKING_POSITION:
             parkingPosition = self.vehicle.remote.domains['parking']['parkingPosition']
             if parkingPosition.carCapturedTimestamp.enabled and parkingPosition.carCapturedTimestamp.value is not None:
@@ -220,32 +218,27 @@ class TripAgent:
                 self.lastParkingPositionLongitude = parkingPosition.longitude.value
             if self.trip is not None:
                 if parkingPosition.carCapturedTimestamp.enabled and parkingPosition.carCapturedTimestamp.value is not None:
-                    with self.session.begin_nested():
-                        if parkingPosition.carCapturedTimestamp.value > self.trip.startDate:
-                            self.trip.endDate = parkingPosition.carCapturedTimestamp.value
-                            if Privacy.NO_LOCATIONS not in self.privacy:
-                                if parkingPosition.latitude.enabled and parkingPosition.latitude.value is not None \
-                                        and parkingPosition.longitude.enabled and parkingPosition.longitude.value is not None:
-                                    self.trip.destination_position_latitude = parkingPosition.latitude.value
-                                    self.trip.destination_position_longitude = parkingPosition.longitude.value
-                                    self.trip.destination_location = locationFromLatLonWithGeofence(self.session,
-                                                                                                    parkingPosition.latitude.value,
-                                                                                                    parkingPosition.longitude.value)
+                    if parkingPosition.carCapturedTimestamp.value > self.trip.startDate:
+                        self.trip.date['end'] = parkingPosition.carCapturedTimestamp.value
 
-                            if self.vehicle.remote.statusExists('measurements', 'odometerStatus') \
-                                    and self.vehicle.remote.domains['measurements']['odometerStatus'].enabled:
-                                odometerMeasurement = self.vehicle.remote.domains['measurements']['odometerStatus']
-                                if odometerMeasurement.odometer.enabled and odometerMeasurement.odometer is not None:
-                                    self.trip.end_mileage_km = odometerMeasurement.odometer.value
+                        if parkingPosition.latitude.enabled and parkingPosition.latitude.value is not None \
+                                and parkingPosition.longitude.enabled and parkingPosition.longitude.value is not None:
+                            self.trip.position['end'] = Position(lat=parkingPosition.latitude, long=parkingPosition.longitude)
 
-                            self.trip = None
+                        if self.vehicle.remote.statusExists('measurements', 'odometerStatus') \
+                                and self.vehicle.remote.domains['measurements']['odometerStatus'].enabled:
+                            odometerMeasurement = self.vehicle.remote.domains['measurements']['odometerStatus']
+                            if odometerMeasurement.odometer.enabled and odometerMeasurement.odometer is not None:
+                                self.trip.mileage['end'] = odometerMeasurement.odometer.value
 
-                            LOG.info(f'Vehicle {self.vehicle.vin} ended a trip')
-                        else:
-                            self.session.delete(self.trip)
-                            self.trip = None
-                            LOG.info(f'Previously started trip for {self.vehicle.vin} was invalid. Deleting it now.')
-                    self.session.commit()
+# TODO: update (trip)
+                        self.trip = None
+
+                        LOG.info(f'Vehicle {self.vehicle.vin} ended a trip')
+                    else:
+                        self.session.delete(self.trip)
+                        self.trip = None
+                        LOG.info(f'Previously started trip for {self.vehicle.vin} was invalid. Deleting it now.')
             else:
                 if flags is not None:
                     LOG.info(

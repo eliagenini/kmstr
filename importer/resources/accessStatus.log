@@ -1,0 +1,40 @@
+New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/overallStatus: OverallState.SAFE
+Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/overallStatus: OverallState.SAFE
+New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doorLockStatus: LockState.LOCKED
+Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doorLockStatus: LockState.LOCKED
+New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/bonnet/lockState: LockState.UNKNOWN
+Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/bonnet/lockState: LockState.UNKNOWN
+New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/bonnet/openState: OpenState.CLOSED
+Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/bonnet/openState: OpenState.CLOSED
+New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/frontLeft/lockState: LockState.LOCKED
+Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/frontLeft/lockState: LockState.LOCKED
+New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/frontLeft/openState: OpenState.CLOSED
+Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/frontLeft/openState: OpenState.CLOSED
+New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/frontRight/lockState: LockState.LOCKED
+Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/frontRight/lockState: LockState.LOCKED
+New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/frontRight/openState: OpenState.CLOSED
+Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/frontRight/openState: OpenState.CLOSED
+New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/rearLeft/lockState: LockState.LOCKED
+Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/rearLeft/lockState: LockState.LOCKED
+New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/rearLeft/openState: OpenState.CLOSED
+Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/rearLeft/openState: OpenState.CLOSED
+New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/rearRight/lockState: LockState.LOCKED
+Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/rearRight/lockState: LockState.LOCKED
+New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/rearRight/openState: OpenState.CLOSED
+Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/rearRight/openState: OpenState.CLOSED
+New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/trunk/lockState: LockState.LOCKED
+Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/trunk/lockState: LockState.LOCKED
+New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/trunk/openState: OpenState.CLOSED
+Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/doors/trunk/openState: OpenState.CLOSED
+New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/windows/frontLeft/openState: OpenState.CLOSED
+Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/windows/frontLeft/openState: OpenState.CLOSED
+New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/windows/frontRight/openState: OpenState.CLOSED
+Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/windows/frontRight/openState: OpenState.CLOSED
+New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/windows/rearLeft/openState: OpenState.CLOSED
+Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/windows/rearLeft/openState: OpenState.CLOSED
+New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/windows/rearRight/openState: OpenState.CLOSED
+Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/windows/rearRight/openState: OpenState.CLOSED
+New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/windows/roofCover/openState: OpenState.UNSUPPORTED
+Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/windows/roofCover/openState: OpenState.UNSUPPORTED
+New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/windows/sunRoof/openState: OpenState.UNSUPPORTED
+Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/windows/sunRoof/openState: OpenState.UNSUPPORTED

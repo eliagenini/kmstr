@@ -1,17 +1,25 @@
 from weconnect.addressable import AddressableLeaf
+from sqlalchemy import Boolean, Column, Integer, String
+
+from models.base import Base
+from models.datetime_decorator import DatetimeDecorator
 
 
-class Vehicle:
+class Vehicle(Base):
+    __tablename__ = 'vehicles'
+    __table_args__ = {'schema': 'kmstr'}
 
-    def __init__(self, data):
-        self.id = data['id']
-        self.vin = data['vin']
-        self.model = data['model']
-        self.nickname = data['nickname']
-        self.lastUpdate = data['last_update']
-        self.lastChange = data['last_change']
+    vin = Column(String(17), primary_key=True)
+    model = Column(String(256))
+    nickname = Column(String(256))
+    online = Column(Boolean)
+    last_update = Column(DatetimeDecorator)
+    last_change = Column(DatetimeDecorator)
 
-        self.remote = None
+    remote = None
+
+    def __init__(self, vin):
+        self.vin = vin
 
     def connect(self, vehicle):
         self.remote = vehicle
@@ -35,3 +43,6 @@ class Vehicle:
     def __on_nickname_change(self, element, flags):
         if self.nickname != element.value:
             self.nickname = element.value
+
+    def to_string(self):
+        return f'{self.nickname} ({self.model})'
