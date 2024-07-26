@@ -23,4 +23,8 @@ Kmstr was developed to enhance the management and tracking of my vehicles' data.
 
 ## Note
 
-This is a personal project and is not affiliated with Volkswagen or tillsteinbach. The code is available under [specific license].
+This is a personal project and is not affiliated with Volkswagen or tillsteinbach. The code is available under the Creative Commons Zero v1.0 Universal License.
+
+### Acknowledgements
+
+This project uses the tillsteinbach/WeConnect-python API, which is licensed under the MIT License.
