@@ -6,6 +6,7 @@ import logging
 
 LOG = logging.getLogger("kmstr")
 
+
 class BaseAgent(ABC):
     def __init__(self, session, vehicle):
         self.current = None
@@ -37,4 +38,4 @@ class BaseAgent(ABC):
         self.session.commit()
 
     def get_last(self):
-        pass
+        LOG.debug("Looking for last record")

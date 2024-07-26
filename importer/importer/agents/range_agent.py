@@ -12,6 +12,7 @@ LOG = logging.getLogger("kmstr")
 
 class RangeAgent(BaseAgent):
     def __init__(self, session, vehicle):
+        LOG.debug("Initializing RangeAgent")
         super().__init__(session, vehicle)
 
         self.current = self.get_last()
@@ -29,6 +30,7 @@ class RangeAgent(BaseAgent):
                 )
 
     def get_last(self):
+        super().get_last()
         return (self.session.query(Range)
                 .filter(and_(Range.vehicle == self.vehicle,
                              Range.captured_timestamp.isnot(None)))

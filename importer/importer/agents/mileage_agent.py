@@ -15,6 +15,7 @@ LOG = logging.getLogger("kmstr")
 
 class MileageAgent(BaseAgent):
     def __init__(self, session, vehicle):
+        LOG.debug("Initializing MileageAgent")
         super().__init__(session, vehicle)
 
         self.current = self.get_last()
@@ -31,6 +32,7 @@ class MileageAgent(BaseAgent):
                     self.vehicle.remote.domains['measurements']['odometerStatus'].carCapturedTimestamp, None)
 
     def get_last(self):
+        super().get_last()
         return (self.session.query(Mileage)
                 .filter(and_(Mileage.vehicle == self.vehicle,
                              Mileage.captured_timestamp.isnot(None)))

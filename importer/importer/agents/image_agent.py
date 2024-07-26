@@ -13,6 +13,7 @@ LOG = logging.getLogger("kmstr")
 
 class ImageAgent(BaseAgent):
     def __init__(self, session, vehicle):
+        LOG.debug("Initializing ImageAgent")
         super().__init__(session, vehicle)
 
         self.current = self.get_last()
@@ -30,6 +31,7 @@ class ImageAgent(BaseAgent):
                     self.vehicle.remote.pictures[picture], None)
 
     def get_last(self):
+        super().get_last()
         result = {}
         pictures = (self.session.query(Picture)
                     .filter(Picture.vehicle == self.vehicle)

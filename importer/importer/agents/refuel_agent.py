@@ -2,7 +2,7 @@ import logging
 from datetime import datetime, timezone, timedelta
 from agents.base import BaseAgent
 
-from utils.location_util import amenityFromLatLon
+from utils.location_util import amenity_from_lat_lon
 from weconnect.addressable import AddressableLeaf, AddressableAttribute
 
 from models import Refuel
@@ -12,6 +12,7 @@ LOG = logging.getLogger("kmstr")
 
 class RefuelAgent(BaseAgent):
     def __init__(self, session, vehicle):
+        LOG.debug("Initializing RefuelAgent")
         super().__init__(session, vehicle)
 
         self.primary_current_soc_pct = None
@@ -80,11 +81,11 @@ class RefuelAgent(BaseAgent):
                             and parking_position.longitude.enabled and parking_position.longitude.value is not None:
                         position_latitude = parking_position.latitude.value
                         position_longitude = parking_position.longitude.value
-                        location = amenityFromLatLon(self.session, parking_position.latitude.value, parking_position.longitude.value, 150, 'fuel',withFallback=True)
+                        location = amenity_from_lat_lon(self.session, parking_position.latitude.value, parking_position.longitude.value, 150, 'fuel', withFallback=True)
 
                 if position_latitude is None and self.last_position is not None and (self.last_position[0] > (element.value - timedelta(minutes=15))):
                     _, position_latitude, position_longitude = self.last_position
-                    location = amenityFromLatLon(self.session, parking_position.latitude.value, parking_position.longitude.value, 150, 'fuel',withFallback=True)
+                    location = amenity_from_lat_lon(self.session, parking_position.latitude.value, parking_position.longitude.value, 150, 'fuel', withFallback=True)
 
                 # Refuel event took place (as the car somethimes finds one or two percent of fuel somewhere lets give a 5 percent margin)
                 if self.primary_current_soc_pct is not None and (

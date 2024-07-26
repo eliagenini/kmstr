@@ -34,9 +34,3 @@ class Trip(Base):
         self.start_position_longitude = start_position_longitude
         self.start_location = start_location
         self.start_mileage = start_mileage
-
-
-class Position:
-    def __init__(self, lat, long):
-        self.latitude = lat
-        self.longitude = long

@@ -10,7 +10,7 @@ from models.location import Location
 LOG = logging.getLogger("VWsFriend")
 
 
-def locationFromLatLonWithGeofence(session, latitude, longitude):
+def location_from_lat_lon_with_geofence(session, latitude, longitude):
     if latitude is None or longitude is None:
         return None
     geofences: Geofence = session.query(Geofence).filter(and_(Geofence.latitude.isnot(None), Geofence.longitude.isnot(None))).all()
@@ -19,10 +19,10 @@ def locationFromLatLonWithGeofence(session, latitude, longitude):
     for distance, geofence in geofence_distance:
         if distance < geofence.radius and geofence.location is not None:
             return geofence.location
-    return locationFromLatLon(session, latitude, longitude)
+    return location_from_lat_lon(session, latitude, longitude)
 
 
-def locationFromLatLon(session, latitude, longitude):
+def location_from_lat_lon(session, latitude, longitude):
     query = {
         'lat': latitude,
         'lon': longitude,
@@ -46,7 +46,7 @@ def locationFromLatLon(session, latitude, longitude):
     return None
 
 
-def amenityFromLatLon(session, latitude, longitude, radius, amenity, withFallback=False):
+def amenity_from_lat_lon(session, latitude, longitude, radius, amenity, withFallback=False):
     northWest = inverse_haversine((latitude, longitude), radius, Direction.NORTHWEST, unit=Unit.METERS)
     southEast = inverse_haversine((latitude, longitude), radius, Direction.SOUTHEAST, unit=Unit.METERS)
     query = {
@@ -74,7 +74,7 @@ def amenityFromLatLon(session, latitude, longitude, radius, amenity, withFallbac
                     location = Location(jsonDict=place)
                     return session.merge(location)
         if withFallback:
-            return locationFromLatLon(session, latitude, longitude)
+            return location_from_lat_lon(session, latitude, longitude)
     except requests.exceptions.RetryError as retryError:
         LOG.error('Could not retrieve location: %s', retryError)
     return None
