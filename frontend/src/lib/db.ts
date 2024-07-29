@@ -5,7 +5,7 @@ import postgres from 'postgres';
 
 import { count, eq } from 'drizzle-orm';
 import { vehicles, pictures, picturesRelations, vehiclesRelations } from "./schema";
-import { current_mileage, current_ranges, current_fuel_level } from "./schema"; // views
+import { current_mileage, current_ranges, current_fuel_level, current_parkings } from "./schema"; // views
 
 export const db = drizzle(
     postgres(process.env.POSTGRES_URL!),
@@ -18,7 +18,8 @@ export const db = drizzle(
             vehiclesRelations,
             current_mileage,
             current_fuel_level,
-            current_ranges}
+            current_ranges,
+            current_parkings}
     });
 
 export const getVehiclesWithPictures = async () => {
@@ -66,6 +67,19 @@ export const getCurrentRangeByVehicle = async (vin: string) => {
             })
             .from(current_ranges)
             .where(eq(current_ranges.vin, vin))
+    }
+}
+
+export const getCurrentParkingByVehicle = async (vin: string) => {
+    return {
+        parking: await db
+            .select({
+                location: current_parkings.location,
+                latitude: current_parkings.latitude,
+                longitude: current_parkings.longitude
+            })
+            .from(current_parkings)
+            .where(eq(current_parkings.vin, vin))
     }
 }
 

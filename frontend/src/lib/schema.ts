@@ -39,6 +39,18 @@ export const current_ranges = mySchema.table(
         km: integer('total_range_km'),
         captured: timestamp('captured_timestamp')
     });
+
+export const current_parkings = mySchema.table(
+    'current_parking',
+    {
+        id: integer('id'),
+        vin: text('vin'),
+        location: integer('osm_id'),
+        latitude: numeric('latitude'),
+        longitude: numeric('longitude'),
+        captured: timestamp('captured_timestamp')
+    });
+
 export const vehicles = mySchema.table(
   'vehicles',
   {

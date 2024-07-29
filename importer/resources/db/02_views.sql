@@ -110,6 +110,24 @@ SELECT id,
 FROM ranked_ranges
 WHERE rn = 1;
 
+CREATE OR REPLACE VIEW kmstr.current_parking AS
+WITH ranked_parkings AS (SELECT pa.id,
+                               pa.vin,
+                               lo.osm_id,
+                               pa.latitude,
+                               pa.longitude,
+                               pa.captured_timestamp,
+                               ROW_NUMBER() OVER (PARTITION BY pa.vin ORDER BY pa.captured_timestamp DESC) AS rn
+                        FROM kmstr.parkings pa
+                        LEFT OUTER JOIN kmstr.locations lo ON (lo.osm_id = pa.location_id))
+SELECT id,
+       vin,
+       osm_id,
+       latitude,
+       longitude,
+       captured_timestamp
+FROM ranked_parkings
+WHERE rn = 1;
 COMMIT;
 
 BEGIN;

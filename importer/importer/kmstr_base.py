@@ -57,7 +57,7 @@ class Kmstr:
         self.conn = None
         self.username = 'elia.genini@gmail.com'
         self.password = '12345678!'
-        self.interval = 300
+        self.interval = 600
         self.subscriptions = []
 
         self.agents = {}
