@@ -17,7 +17,7 @@ from weconnect.domain import Domain
 from weconnect.elements import vehicle as elementvehicle
 
 from models import Vehicle, Picture
-from agents import RangeAgent, MileageAgent, RefuelAgent, ImageAgent
+from agents import RangeAgent, MileageAgent, RefuelAgent, ImageAgent, TripAgent, ParkingAgent
 
 LOG_LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 DEFAULT_LOG_LEVEL = "INFO"
@@ -51,7 +51,7 @@ class Kmstr:
         self.engine = None
         self.session = None
         self.db_url = 'postgresql+psycopg://kmstr_appl:Password0!@localhost:5432/kmstr'
-        self.db_conn_args = {'options': '-c timezone=utc'}
+        self.db_conn_args = {'options': '-c timezone=Europe/Zurich'}
         self.endpoint = 'http://localhost:3000'
 
         self.conn = None
@@ -200,14 +200,7 @@ class Kmstr:
             self.agents[element.vin.value].append(RefuelAgent(session=self.session, vehicle=found_vehicle))
             self.agents[element.vin.value].append(ImageAgent(session=self.session, vehicle=found_vehicle))
             #self.agents[element.vin.value].append(TripAgent(session=self.session, vehicle=found_vehicle, update_interval=self.interval))
-            # self.agents[element.vin.value].append(BatteryAgent(session=self.Session(), vehicle=foundVehicle))
-            # self.agents[element.vin.value].append(ChargeAgent(session=self.Session(), vehicle=foundVehicle, privacy=self.privacy))
+            self.agents[element.vin.value].append(ParkingAgent(session=self.session, vehicle=found_vehicle))
             # self.agents[element.vin.value].append(StateAgent(session=self.Session(), vehicle=foundVehicle, updateInterval=self.interval))
-            # self.agents[element.vin.value].append(ClimatizationAgent(session=self.Session(), vehicle=foundVehicle))
-            # self.agents[element.vin.value].append(RefuelAgent(session=self.Session(), vehicle=foundVehicle, privacy=self.privacy))
-            #self.agents[element.vin.value].append(TripAgent(endpoint=self.endpoint, vehicle=found_vehicle, update_interval=self.interval))
             # self.agents[element.vin.value].append(WarningLightAgent(session=self.Session(), vehicle=foundVehicle))
             # self.agents[element.vin.value].append(MaintenanceAgent(session=self.Session(), vehicle=foundVehicle))
-            #     if foundVehicle.carType == RangeStatus.CarType.UNKNOWN:
-            #         LOG.warning('Vehicle %s has an unkown carType, thus some features won\'t be available until the correct carType could be detected',
-            #                     foundVehicle.vin)

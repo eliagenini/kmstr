@@ -85,7 +85,7 @@ class RefuelAgent(BaseAgent):
 
                 if position_latitude is None and self.last_position is not None and (self.last_position[0] > (element.value - timedelta(minutes=15))):
                     _, position_latitude, position_longitude = self.last_position
-                    location = amenity_from_lat_lon(self.session, parking_position.latitude.value, parking_position.longitude.value, 150, 'fuel', withFallback=True)
+                    location = amenity_from_lat_lon(self.session, position_latitude, position_longitude, 150, 'fuel', withFallback=True)
 
                 # Refuel event took place (as the car somethimes finds one or two percent of fuel somewhere lets give a 5 percent margin)
                 if self.primary_current_soc_pct is not None and (

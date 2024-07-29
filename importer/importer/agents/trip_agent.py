@@ -184,10 +184,15 @@ class TripAgent(BaseAgent):
             self.current = Trip(
                 vehicle=self.vehicle,
                 start_date=time,
-                start_position_latitude=self.last_parking_position.latitude,
-                start_position_longitude=self.last_parking_position.longitude,
-                start_location=self.last_parking_position.get_location(self.session),
+                start_position_latitude=None,  # None last_parking_position
+                start_position_longitude=None,
+                start_location=None,
                 start_mileage=None)
+
+            if self.last_parking_position is not None:
+                self.current.start_position_latitude = self.last_parking_position.latitude
+                self.current.start_position_longitude = self.last_parking_position.longitude
+                self.current.start_location = self.last_parking_position.get_location(self.session)
 
             if (self.vehicle.remote.statusExists('measurements', 'odometerStatus') and
                     self.vehicle.remote.domains['measurements']['odometerStatus'].enabled):
@@ -200,31 +205,12 @@ class TripAgent(BaseAgent):
 
     def __on_car_captured_timestamp_changed(self, element, flags):
         if self.mode == TripAgent.Mode.PARKING_POSITION:
-            parking_position = self.vehicle.remote.domains['parking']['parkingPosition']
-
-            if self.last_parking_position is None:
-                self.last_parking_position = Position(latitude=None, longitude=None, timestamp=None)
-
-            if parking_position.carCapturedTimestamp.enabled and parking_position.carCapturedTimestamp.value is not None:
-                self.last_parking_position.timestamp = parking_position.carCapturedTimestamp.value
-            if (parking_position.latitude.enabled and parking_position.latitude.value is not None and
-                    parking_position.longitude.enabled and parking_position.longitude.value is not None):
-                self.last_parking_position.latitude = parking_position.latitude.value
-                self.last_parking_position.longitude = parking_position.longitude.value
+            self.set_last_parking_position(self.vehicle.remote.domains['parking']['parkingPosition'])
 
     def __on_car_captured_timestamp_enabled(self, element, flags):  # noqa: C901
         if self.mode == TripAgent.Mode.PARKING_POSITION:
             parking_position = self.vehicle.remote.domains['parking']['parkingPosition']
-
-            if self.last_parking_position is None:
-                self.last_parking_position = Position(latitude=None, longitude=None, timestamp=None)
-
-            if parking_position.carCapturedTimestamp.enabled and parking_position.carCapturedTimestamp.value is not None:
-                self.last_parking_position.timestamp = parking_position.carCapturedTimestamp.value
-            if (parking_position.latitude.enabled and parking_position.latitude.value is not None and
-                    parking_position.longitude.enabled and parking_position.longitude.value is not None):
-                self.last_parking_position.latitude = parking_position.latitude.value
-                self.last_parking_position.longitude = parking_position.longitude.value
+            self.set_last_parking_position(parking_position=parking_position)
 
             if self.current is not None:
                 if parking_position.carCapturedTimestamp.enabled and parking_position.carCapturedTimestamp.value is not None:
@@ -342,3 +328,15 @@ class TripAgent(BaseAgent):
                     if flags is not None:
                         LOG.info(
                             f'Vehicle {self.vehicle.vin} reports to be inactive, but no trip was started (this is ok during startup)')
+
+    def set_last_parking_position(self, parking_position):
+        if (parking_position.carCapturedTimestamp.enabled and
+                parking_position.carCapturedTimestamp.value is not None and
+                parking_position.latitude.enabled and
+                parking_position.latitude.value is not None and
+                parking_position.longitude.enabled and
+                parking_position.longitude.value is not None):
+            self.last_parking_position = Position(
+                latitude=parking_position.latitude.value,
+                longitude=parking_position.longitude.value,
+                timestamp=parking_position.carCapturedTimestamp.value)

@@ -112,6 +112,7 @@ CREATE TABLE IF NOT EXISTS kmstr.locations
 CREATE TABLE IF NOT EXISTS kmstr.refuels
 (
     id  serial NOT NULL,
+    vin           text      NOT NULL,
     location_id integer,
     date timestamp,
     mileage_km integer,
@@ -129,6 +130,17 @@ CREATE TABLE IF NOT EXISTS kmstr.pictures
     image       bytea   NOT NULL,
     captured_timestamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS kmstr.parkings
+(
+    id            serial    NOT NULL,
+    vin           text      NOT NULL,
+    location_id bigint,
+    latitude numeric,
+    longitude numeric,
+    captured_timestamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 
 ALTER TABLE ONLY kmstr.vehicles
     ADD CONSTRAINT vehicles_pk PRIMARY KEY (vin);
@@ -157,6 +169,10 @@ ALTER TABLE ONLY kmstr.refuels
 ALTER TABLE ONLY kmstr.pictures
     ADD CONSTRAINT pictures_pk PRIMARY KEY (id),
     ADD CONSTRAINT pictures_fk_vehicle FOREIGN KEY (vin) REFERENCES kmstr.vehicles (vin);
+ALTER TABLE ONLY kmstr.parkings
+    ADD CONSTRAINT parkings_pk PRIMARY KEY (id),
+    ADD CONSTRAINT parkings_fk_vehicle FOREIGN KEY (vin) REFERENCES kmstr.vehicles (vin),
+    ADD CONSTRAINT parkings_fk_location FOREIGN KEY (location_id) REFERENCES kmstr.locations (osm_id);
 
 COMMIT;
 

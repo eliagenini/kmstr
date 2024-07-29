@@ -16,8 +16,8 @@ class Refuel(Base):
     mileage_km = Column(Integer, nullable=False)
     start_pct = Column(Integer)
     end_pct = Column(Integer)
-    position_latitude = Column(Float)
-    position_longitude = Column(Float)
+    latitude = Column(Float)
+    longitude = Column(Float)
 
     location = relationship("Location")
     vehicle = relationship("Vehicle")
@@ -28,6 +28,6 @@ class Refuel(Base):
         self.mileage_km = mileage_km
         self.start_pct = start_pct
         self.end_pct = end_pct
-        self.position_latitude = latitude
-        self.position_longitude = longitude
+        self.latitude = latitude
+        self.longitude = longitude
         self.location = location

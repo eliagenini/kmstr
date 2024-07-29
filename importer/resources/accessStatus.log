@@ -38,3 +38,14 @@ New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessSta
 Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/windows/roofCover/openState: OpenState.UNSUPPORTED
 New attribute is available: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/windows/sunRoof/openState: OpenState.UNSUPPORTED
 Value changed: /vehicles/WVGZZZ1T5RW028165/domains/access/accessStatus/windows/sunRoof/openState: OpenState.UNSUPPORTED
+
+
+
+
+
+
+sqlalchemy.exc.IntegrityError: (psycopg.errors.NotNullViolation) null value in column "start_position_latitude" of relation "trips" violates not-null constraint
+DETAIL:  Failing row contains (1, WVWZZZAWZMY037089, 2024-07-26 17:08:25, null, null, null, null, null, null, null, 23073, null, 2024-07-26 17:13:25.760082).
+[SQL: INSERT INTO kmstr.trips (vin, start_date, end_date, start_position_latitude, start_position_longitude, start_location_id, end_position_latitude, end_position_longitude, end_location_id, start_mileage, end_mileage) VALUES (%(vin)s::VARCHAR, %(start_date)s::TIMESTAMP WITHOUT TIME ZONE, %(end_date)s::TIMESTAMP WITHOUT TIME ZONE, %(start_position_latitude)s, %(start_position_longitude)s, %(start_location_id)s::BIGINT, %(end_position_latitude)s, %(end_position_longitude)s, %(end_location_id)s::BIGINT, %(start_mileage)s::INTEGER, %(end_mileage)s::INTEGER) RETURNING kmstr.trips.id]
+[parameters: {'vin': 'WVWZZZAWZMY037089', 'start_date': datetime.datetime(2024, 7, 26, 15, 8, 25, tzinfo=datetime.timezone.utc), 'end_date': None, 'start_position_latitude': None, 'start_position_longitude': None, 'start_location_id': None, 'end_position_latitude': None, 'end_position_longitude': None, 'end_location_id': None, 'start_mileage': 23073, 'end_mileage': None}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
