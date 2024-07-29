@@ -5,14 +5,7 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
-import { Bar, BarChart } from "recharts"
 
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart"
 
 const chartData = [
   { month: "January", desktop: 186, mobile: 80 },
@@ -22,16 +15,10 @@ const chartData = [
   { month: "May", desktop: 209, mobile: 130 },
   { month: "June", desktop: 214, mobile: 140 },
 ]
-const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "#2563eb",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "#60a5fa",
-  },
-} satisfies ChartConfig
+
+import dynamic from 'next/dynamic'
+import BasicChart from 'components/Chart';
+
 import { current_mileage } from '@/lib/schema';
 import { getCurrentMileage } from '@/lib/db';
 
@@ -74,7 +61,7 @@ export function Summary({
 
         </CardHeader>
         <CardContent>
-          <Component />
+          <BasicChart data={chartData} />
         </CardContent>
       </Card>
       <Card x-chunk="dashboard-01-chunk-2">
@@ -111,13 +98,3 @@ export function CurrentPosition() {
   )
 }
 
-export function Component() {
-  return (
-    <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-      <BarChart accessibilityLayer data={chartData}>
-        <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-        <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
-      </BarChart>
-    </ChartContainer>
-  )
-}

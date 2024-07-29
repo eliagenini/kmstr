@@ -14,13 +14,13 @@ import { relations } from "drizzle-orm"
 export const mySchema = pgSchema("kmstr")
 
 export const current_mileage = mySchema.table(
-    'current_mileage',
-    {
-        id: integer('id'),
-        vin: text('vin'),
-        km: integer('mileage_km'),
-        captured: timestamp('captured_timestamp')
-    });
+  'current_mileage',
+  {
+    id: integer('id'),
+    vin: text('vin'),
+    km: integer('mileage_km'),
+    captured: timestamp('captured_timestamp')
+  });
 
 export const current_fuel_level = mySchema.table(
     'current_fuel_level',
@@ -39,7 +39,6 @@ export const current_ranges = mySchema.table(
         km: integer('total_range_km'),
         captured: timestamp('captured_timestamp')
     });
-
 export const vehicles = mySchema.table(
   'vehicles',
   {

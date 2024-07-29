@@ -22,9 +22,10 @@ import Link from 'next/link';
 
 export function VehicleCard({ vehicle }: { vehicle }) {
   let imageBuffer = vehicle.pictures[1].image;
-  Buffer.from(imageBuffer).toString('base64')
-  const base64Image = Buffer.from(imageBuffer).toString('base64');
-  const picture = `data:image/png;base64,${base64Image}`;
+  let base64Image = Buffer.from(imageBuffer).toString('base64');
+  let mimeType = 'image/png';
+
+  const dataUri = `data:${mimeType};base64,${base64Image}`;
   return (
     <Card>
       <CardHeader>
@@ -33,7 +34,7 @@ export function VehicleCard({ vehicle }: { vehicle }) {
       </CardHeader>
       <CardContent>
         <Image
-          src={picture}
+          src={dataUri}
           alt={vehicle.nickname}
           width={300}
           height={200}
