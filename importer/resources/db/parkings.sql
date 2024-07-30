@@ -1,0 +1,12 @@
+INSERT INTO kmstr.parkings (id, vin, location_id, latitude, longitude, captured_timestamp) VALUES (1, 'WVWZZZAWZMY037089', 478551927, 46.264852, 9.002169, '2024-07-26 13:43:44.000000');
+INSERT INTO kmstr.parkings (id, vin, location_id, latitude, longitude, captured_timestamp) VALUES (2, 'WVGZZZ1T5RW028165', 478551927, 46.264905, 9.0021, '2024-07-27 21:57:35.000000');
+INSERT INTO kmstr.parkings (id, vin, location_id, latitude, longitude, captured_timestamp) VALUES (3, 'WVWZZZAWZMY037089', 352398291, 46.174699, 9.018304, '2024-07-28 10:09:36.000000');
+INSERT INTO kmstr.parkings (id, vin, location_id, latitude, longitude, captured_timestamp) VALUES (4, 'WVGZZZ1T5RW028165', 673047354, 46.264999, 9.00245, '2024-07-28 11:24:01.000000');
+INSERT INTO kmstr.parkings (id, vin, location_id, latitude, longitude, captured_timestamp) VALUES (5, 'WVGZZZ1T5RW028165', 478551927, 46.264905, 9.002089, '2024-07-28 17:06:31.000000');
+INSERT INTO kmstr.parkings (id, vin, location_id, latitude, longitude, captured_timestamp) VALUES (6, 'WVWZZZAWZMY037089', 183552920, 46.191459, 9.018401, '2024-07-29 08:39:03.000000');
+INSERT INTO kmstr.parkings (id, vin, location_id, latitude, longitude, captured_timestamp) VALUES (7, 'WVGZZZ1T5RW028165', 248366367, 46.223066, 9.047299, '2024-07-29 10:44:06.000000');
+INSERT INTO kmstr.parkings (id, vin, location_id, latitude, longitude, captured_timestamp) VALUES (8, 'WVWZZZAWZMY037089', 478551927, 46.264882, 9.002161, '2024-07-29 11:22:28.000000');
+INSERT INTO kmstr.parkings (id, vin, location_id, latitude, longitude, captured_timestamp) VALUES (9, 'WVWZZZAWZMY037089', 478551927, 46.264872, 9.002157, '2024-07-29 18:01:11.000000');
+INSERT INTO kmstr.parkings (id, vin, location_id, latitude, longitude, captured_timestamp) VALUES (10, 'WVWZZZAWZMY037089', 310868165, 46.158173, 8.975374, '2024-07-30 07:59:22.000000');
+INSERT INTO kmstr.parkings (id, vin, location_id, latitude, longitude, captured_timestamp) VALUES (11, 'WVGZZZ1T5RW028165', 348428221, 46.16539, 8.798511, '2024-07-30 10:32:12.000000');
+INSERT INTO kmstr.parkings (id, vin, location_id, latitude, longitude, captured_timestamp) VALUES (12, 'WVWZZZAWZMY037089', 205800546, 46.21348, 9.032158, '2024-07-30 10:55:36.000000');
