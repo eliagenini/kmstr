@@ -2,7 +2,7 @@ import {
     getCurrentMileageByVehicle,
     getCurrentFuelByVehicle,
     getCurrentRangeByVehicle,
-    getCurrentParkingByVehicle
+    getCurrentParkingByVehicle, getVehiclesWithPictures
 } from "@/lib/db";
 import {SummaryCard} from "@/app/dashboard/vehicle/summary-card";
 import {MileageCard} from "@/app/dashboard/vehicle/mileage-card";
@@ -24,7 +24,6 @@ export default async function VehiclePage() {
     const { fuel } = await getCurrentFuelByVehicle(vin);
     const { range } = await getCurrentRangeByVehicle(vin);
     const { parking } = await getCurrentParkingByVehicle(vin);
-console.log(parking[0]);
     return (
         <div className="grid gap-4 md:grid-cols-4 md:gap-8 lg:grid-cols-4">
             <MileageCard mileage={mileage[0].km} />

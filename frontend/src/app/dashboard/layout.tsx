@@ -20,6 +20,15 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator
 } from '@/components/ui/breadcrumb';
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import {
@@ -30,20 +39,25 @@ import {
 import { VercelLogo } from '@/components/icons';
 import Providers from './providers';
 import { NavItem } from './nav-item';
+import {getVehiclesWithPictures} from "@/lib/db";
 
-export default function DashboardLayout({
-                                            children
-                                        }: {
+export default async function DashboardLayout({
+                                                  children
+                                              }: {
     children: React.ReactNode;
 }) {
+    const {vehicles, totalVehicles} = await getVehiclesWithPictures();
+
     return (
         <Providers>
             <main className="flex min-h-screen w-full flex-col bg-muted/40">
-                <DesktopNav />
+                <DesktopNav/>
                 <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-                    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-                        <MobileNav />
-                        <DashboardBreadcrumb />
+                    <header
+                        className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+                        <MobileNav/>
+                        <DashboardBreadcrumb/>
+                        <SelectVehicle vehicles={vehicles}/>
                     </header>
                     <main className="grid flex-1 items-start gap-2 p-4 sm:px-6 sm:py-0 md:gap-4 bg-muted/40">
                         {children}
@@ -163,9 +177,27 @@ function MobileNav() {
     );
 }
 
+export function SelectVehicle({vehicles}: {vehicles;}) {
+    return (
+        <Select>
+            <SelectTrigger className="w-full ">
+                <SelectValue placeholder="Select a vehicle" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectGroup>
+                    <SelectLabel>Vehicles</SelectLabel>
+                    {vehicles.map((vehicle) => (
+                        <SelectItem key={vehicle.vin} value={vehicle.vin}>{vehicle.nickname} <small>({vehicle.vin})</small></SelectItem>
+                    ))}
+                </SelectGroup>
+            </SelectContent>
+        </Select>
+    )
+}
+
 function DashboardBreadcrumb() {
     return (
-        <Breadcrumb className="hidden md:flex">
+        <Breadcrumb className="hidden md:flex w-[500px]">
             <BreadcrumbList>
                 <BreadcrumbItem>
                     <BreadcrumbLink asChild>
