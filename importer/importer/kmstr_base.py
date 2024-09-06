@@ -42,7 +42,7 @@ LOG = logging.getLogger("kmstr")
 
 
 class Kmstr:
-    def __init__(self):
+    def __init__(self, username, password, interval, db_hostname, db_username, db_password, db_name, db_port, tz):
         self.session = None
 
         self.loggingFormat = '%(asctime)s:%(levelname)s:%(module)s:%(message)s'
@@ -50,14 +50,14 @@ class Kmstr:
 
         self.engine = None
         self.session = None
-        self.db_url = 'postgresql+psycopg://kmstr_appl:Password0!@localhost:5432/kmstr'
-        self.db_conn_args = {'options': '-c timezone=Europe/Zurich'}
+        self.db_url = f'postgresql+psycopg://{db_username}:{db_password}@{db_hostname}:{db_port}/{db_name}'
+        self.db_conn_args = {'options': f'-c timezone={tz}'}
         self.endpoint = 'http://localhost:3000'
 
         self.conn = None
-        self.username = 'elia.genini@gmail.com'
-        self.password = '12345678!'
-        self.interval = 600
+        self.username = username # 'elia.genini@gmail.com'
+        self.password = password #'12345678!'
+        self.interval = interval
         self.subscriptions = []
 
         self.agents = {}

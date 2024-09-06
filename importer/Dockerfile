@@ -1,20 +1,32 @@
+## Base ##
+
+FROM ubuntu:22.04 AS base
+
+ARG DEBIAN_FRONTEND="noninteractive"
+
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y python3 python3-pip python3-venv wget && \
+    apt-get install --no-install-recommends -y postgresql-client && \
+    apt-get clean &&  \
+    rm -rf /var/lib/apt/lists/*
+
+RUN python3 -m venv /opt/venv
+
+##  Runner ##
+
+FROM base AS runner
+
+ARG DEBIAN_FRONTEND="noninteractive"
+
 ENV WECONNECT_USER=
 ENV WECONNECT_PASSWORD=
-ENV WECONNECT_INTERVAL=
-ENV DATABASE_URL=
-
-ENV PYTHONUNBUFFERED=1
-
-# syntax=docker/dockerfile:1
-
-# Comments are provided throughout this file to help you get started.
-# If you need more help, visit the Dockerfile reference guide at
-# https://docs.docker.com/go/dockerfile-reference/
-
-# Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
-
-ARG PYTHON_VERSION=3.12
-FROM python:${PYTHON_VERSION}-slim AS base
+ENV WECONNECT_INTERVAL=180
+ENV DB_HOSTNAME=db
+ENV DB_PORT=5432
+ENV DB_USERNAME=kmstr_appl
+ENV DB_PASSWORD=secure
+ENV DB_SCHEMA=kmstr
+ENV TIMEZONE=Europe/Zurich
 
 # Prevents Python from writing pyc files.
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -43,18 +55,17 @@ RUN adduser \
 # into this layer.
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
-    python -m pip install -r requirements.txt
+    python3 -m pip install -r requirements.txt
 
 # Switch to the non-privileged user to run the application.
 USER kmstruser
 
 WORKDIR /importer
 # Copy the source code into the container.
-COPY . .
-
-# Expose the port that the application listens on.
-# EXPOSE 8000
+COPY importer .
 
 # Run the application.
-CMD python3 __main__.py
-# -m uvicorn app:app --host=0.0.0.0 --port=8000
+CMD python3 __main__.py --username=${WECONNECT_USER} --password=${WECONNECT_PASSWORD} --interval=${WECONNECT_INTERVAL} \
+    --db-hostname=${DB_HOSTNAME} --db-port=${DB_PORT} --db-username=${DB_USERNAME} --db-password=${DB_PASSWORD} \
+    --db-name=${DB_NAME} --timezone=${TIMEZONE}
+

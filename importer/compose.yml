@@ -1,0 +1,40 @@
+services:
+  kmstr:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: 'always'
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - WECONNECT_USER=${WECONNECT_USER}
+      - WECONNECT_PASSWORD=${WECONNECT_PASS}
+      - WECONNECT_INTERVAL=${WECONNECT_INTERVAL:-180}
+      - DB_HOSTNAME=${DB_HOSTNAME:-db}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_USERNAME=${DB_USERNAME:-kmstr_appl}
+      - DB_PASSWORD=${DB_PASSWORD:-Password0!}
+      - DB_NAME=${DB_NAME:-kmstr}
+      - TIMEZONE=${TIMEZONE:-Europe/Zurich}
+
+  db:
+    image: postgres:16.3-alpine
+    volumes:
+      - pg:/var/lib/postgresql/data
+      - ./resources/db:/docker-entrypoint-initdb.d
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${DB_USERNAME:-kmstr_appl}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-Password0!}
+      - POSTGRES_DB=${DB_NAME:-kmstr}
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pg:
