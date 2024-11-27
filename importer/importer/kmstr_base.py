@@ -187,7 +187,7 @@ class Kmstr:
                     found_vehicle = vehicle
                     break
             if found_vehicle is None:
-                LOG.info('Found no matching vehicle for vin %s in database, will create a new one', element.vin.value)
+                LOG.info('No matching vehicle found for vin %s in database, will create a new one', element.vin.value)
                 found_vehicle = Vehicle(element.vin.value)
                 with self.session.begin_nested():
                     self.session.add(found_vehicle)
@@ -195,6 +195,7 @@ class Kmstr:
 
             found_vehicle.connect(element)
 
+            # Agents subscriptions
             self.agents[element.vin.value].append(RangeAgent(session=self.session, vehicle=found_vehicle))
             self.agents[element.vin.value].append(MileageAgent(session=self.session, vehicle=found_vehicle))
             self.agents[element.vin.value].append(RefuelAgent(session=self.session, vehicle=found_vehicle))

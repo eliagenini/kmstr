@@ -141,6 +141,21 @@ CREATE TABLE IF NOT EXISTS kmstr.parkings
     captured_timestamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS kmstr.receipts
+(
+    id  serial NOT NULL,
+    amount  numeric NOT NULL,
+    currency_id integer NOT NULL,
+    date    date NOT NULL,
+    last_modified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS kmstr.currencies
+(
+    id  serial  NOT NULL,
+    currency text   NOT NULL
+);
+
 
 ALTER TABLE ONLY kmstr.vehicles
     ADD CONSTRAINT vehicles_pk PRIMARY KEY (vin);
@@ -150,9 +165,6 @@ ALTER TABLE ONLY kmstr.ranges
 ALTER TABLE ONLY kmstr.mileages
     ADD CONSTRAINT mileages_pk PRIMARY KEY (id),
     ADD CONSTRAINT mileages_fk_vehicle FOREIGN KEY (vin) REFERENCES kmstr.vehicles (vin);
--- ALTER TABLE ONLY kmstr.parking
---     ADD CONSTRAINT parking_pk PRIMARY KEY (id),
---     ADD CONSTRAINT parking_fk_vehicle FOREIGN KEY (vin) REFERENCES kmstr.vehicles (vin);
 ALTER TABLE ONLY kmstr.locations
     ADD CONSTRAINT locations_pk PRIMARY KEY (osm_id);
 ALTER TABLE ONLY kmstr.geofences
@@ -173,6 +185,11 @@ ALTER TABLE ONLY kmstr.parkings
     ADD CONSTRAINT parkings_pk PRIMARY KEY (id),
     ADD CONSTRAINT parkings_fk_vehicle FOREIGN KEY (vin) REFERENCES kmstr.vehicles (vin),
     ADD CONSTRAINT parkings_fk_location FOREIGN KEY (location_id) REFERENCES kmstr.locations (osm_id);
+ALTER TABLE ONLY kmstr.currencies
+    ADD CONSTRAINT currencies_pk PRIMARY KEY (id);
+ALTER TABLE ONLY kmstr.receipts
+    ADD CONSTRAINT receipts_pk PRIMARY KEY (id),
+    ADD CONSTRAINT receipts_fk_currency FOREIGN KEY (currency_id) REFERENCES kmstr.currencies (id);
 
 COMMIT;
 
